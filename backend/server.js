@@ -17,18 +17,32 @@ app.use(express.json());
 // Serve uploaded images
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Routes
 app.use("/api/movies",   movieRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/admin",    adminRoutes);
 
-app.get("/", (_req, res) => res.send("CineBook API running ✅"));
+// Test route
+app.get("/", (req, res) => {
+  res.send("API running");
+});
 
+console.log("🚀 Server starting...");
+
+// 🔥 FIX: WAIT for DB before starting server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
-    app.listen(process.env.PORT || 5000, () =>
-      console.log(`🚀 Server running on port ${process.env.PORT || 5000}`)
-    );
+
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`✅ Server running on port ${PORT}`);
+    });
   })
-  .catch((err) => console.error("❌ MongoDB error:", err));
+  .catch((err) => {
+    console.error("❌ MongoDB connection failed:");
+    console.error(err);
+    process.exit(1); // force crash with visible error
+  });
