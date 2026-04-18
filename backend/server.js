@@ -11,25 +11,26 @@ const adminRoutes   = require("./routes/admin");
 
 const app = express();
 
+// middleware
 app.use(cors());
 app.use(express.json());
 
 // Serve uploaded images
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Routes
+// API routes
 app.use("/api/movies",   movieRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/admin",    adminRoutes);
 
-// Test route
+// 🔥 TEST ROUTE (VERY IMPORTANT)
 app.get("/", (req, res) => {
-  res.send("API running");
+  res.send("API running ✅");
 });
 
-console.log("🚀 Server starting...");
+console.log("🚀 Starting server...");
 
-// 🔥 FIX: WAIT for DB before starting server
+// 🔥 CONNECT DB THEN START SERVER
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -42,7 +43,6 @@ mongoose
     });
   })
   .catch((err) => {
-    console.error("❌ MongoDB connection failed:");
-    console.error(err);
-    process.exit(1); // force crash with visible error
+    console.error("❌ MongoDB error:", err);
+    process.exit(1);
   });
